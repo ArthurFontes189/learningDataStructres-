@@ -9,15 +9,22 @@ class StockManager {
 
   // Métodos para Impressoras
   addPrinter(printerModel) {
+    //Verifica se o parametro é uma string e não é vazia
     if (typeof printerModel == "string" && printerModel.trim().length > 0) {
+      // Verifica na array printerModel se existe alguma outra impressora ja adicionada com este nome
       const exists = this.Printers.some(
         (printer) => printer.printerModel === printerModel
       );
+      // Se existir retornará que a impressora ja existe
       if (exists) return "Printer already exists";
+      // cria a nova impressora apos todas as verificações
       const newPrinter = new Printers(printerModel);
+      // adiciona a nova impressora na array
       this.Printers.push(newPrinter);
+      // retorna que foi adicionada com sucesso
       return "Printer added successfully";
     }
+    // caso o valor passado pelo parametro não seja validado, ira retornar o erro
     return "Invalid printer Model";
   }
 
@@ -55,49 +62,61 @@ class StockManager {
   }
 
   removePrinter(printerModel) {
+    //verifica se o parametro passado não é uma string e retorna o erro caso não seja
     if (typeof printerModel !== "string") {
       return "Invalid printer model format";
     }
-
+    // utiliza o metodo findIndex para ver se tem algum printerModel igual ao parametro passado, caso tenha, retornara o indice dele
     const printerIndex = this.Printers.findIndex(
       (printer) => printer.printerModel === printerModel
     );
-
+    // Caso o valor retornado do printerIndex seja -1, quer dizer que o valor não foi encontrado, então ele é inexistente
     if (printerIndex === -1) {
+      //retornara que a impressora nao foi achada
       return "Printer not found";
     }
 
-    // Remover referências nos suprimentos
     this.Supplies.forEach((supply) => {
+      // acessa cada elemento dos materiais, e vê se as impressoras compativeis são a mesma que está sendo removida
       const index = supply.compatiblePrinter.indexOf(printerModel);
+      //caso o valor seja diferente de -1, ou seja, existe, ele ira remover da array utilizando o metodo splice
       if (index !== -1) {
         supply.compatiblePrinter.splice(index, 1);
       }
     });
-
+    // utiliza o metodo splice para remover a impressora da array
     this.Printers.splice(printerIndex, 1);
+    //retorna que a impressora foi removida com sucesso
     return "Printer removed successfully";
   }
 
   getAllPrinters() {
+    // Utilizando o map para melhor vizualização da array de impressoras, e retornando
     return this.Printers.map((printer) => printer.printerModel);
   }
 
   // Métodos para Suprimentos
   addSupplies(type, model, quantity, compatiblePrinter, color) {
+    //fazendo as verificações de type, para saber se é toner ou drum
+    //depois se o valor quantity é inteiro
+    //logo apos ver se o valor quantity é não negativo
     if (
       (type == "toner" || type == "drum") &&
       typeof model == "string" &&
       Number.isInteger(quantity) &&
       quantity >= 0
     ) {
+      //verifica utilizando o metodo some para ver se o supply ja existe na array de supply
       const exists = this.Supplies.some((supply) => supply.model === model);
+      // se existir retorna que ja tem um supply existente
       if (exists) return "Supply already exists";
-
+      // Cria o supply
       const newSupplies = new Supplies(type, model, quantity);
-
+      // verifica se o type é igual a toner
       if (type === "toner") {
+        //verifica se color nao existe
         if (!color) {
+          //apos verificar que nao existe adiciona valor ao color
           newSupplies.color = "black";
         } else if (typeof color == "string") {
           newSupplies.color = color;
